@@ -1453,23 +1453,25 @@ int git_diff_tree_to_tree(
 	git_diff *diff = NULL;
 	char *prefix = NULL;
 	int error = 0;
-
+	git_diff_options default_opts = GIT_DIFF_OPTIONS_INIT;
 	GIT_ASSERT_ARG(out);
 	GIT_ASSERT_ARG(repo);
 
 	*out = NULL;
 
-	if (opts) {
-		/* for tree to tree diff, be case sensitive even if the index is
-		 * currently case insensitive, unless the user explicitly asked
-		 * for case insensitivity
-		 */
-		if ((opts->flags & GIT_DIFF_IGNORE_CASE) != 0) {
-			iflag = GIT_ITERATOR_IGNORE_CASE;
-		}
-		if ((opts->flags & GIT_DIFF_INCLUDE_UNMODIFIED) == 0) {
-			iflag |= GIT_ITERATOR_DONT_AUTOEXPAND;
-		}
+	if (!opts) {
+	    opts = &default_opts;
+	}
+
+	/* for tree to tree diff, be case sensitive even if the index is
+	    * currently case insensitive, unless the user explicitly asked
+	    * for case insensitivity
+	    */
+	if ((opts->flags & GIT_DIFF_IGNORE_CASE) != 0) {
+		iflag = GIT_ITERATOR_IGNORE_CASE;
+	}
+	if ((opts->flags & GIT_DIFF_INCLUDE_UNMODIFIED) == 0) {
+		iflag |= GIT_ITERATOR_DONT_AUTOEXPAND;
 	}
 
 	if ((error = diff_prepare_iterator_opts(&prefix, &a_opts, iflag, &b_opts, iflag, opts)) < 0 ||
